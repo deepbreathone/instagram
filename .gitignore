@@ -3,3 +3,6 @@ credentials.json
 pictures
 .DS_Store
 geckodriver.log
+__pycache__
+.ipynb_checkpoints
+quotes/images/*

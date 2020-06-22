@@ -2,11 +2,15 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+import shutil
 import os
 from os import listdir
 from os.path import isfile, join
 import json
 import random
+import pandas as pd
+
+from generate_image_quote import generate_and_get_image_path
 
 
 class HomePage:
@@ -35,7 +39,7 @@ class HomePage:
         sleep(2)
         save_login = None
         try:
-            save_login = browser.find_element_by_xpath(
+            save_login = self.browser.find_element_by_xpath(
                 "/html/body/div[1]/section/main/div/div/section/div/div[2]"
             )
         except NoSuchElementException:
@@ -57,22 +61,11 @@ class InstaPage:
         super().__init__()
         self.browser = browser
 
-        with open("hashtags.txt") as f:
-            self.hashtags = [h.strip() for h in f.read().split(",")]
-
-        with open("descriptions.txt") as f:
-            self.descriptions = [h.strip() for h in f.read().split(",")]
-
-        # Get random picutre
-        pictures = [p for p in listdir("pictures") if isfile(join("pictures", p))]
-        self.picture_path = os.path.abspath(join("pictures", random.choice(pictures)))
-        print(self.picture_path)
-
-    def upload(self):
+    def upload(self, picture_path, text):
         # Disable the file picker and call sendKeys on an <input type="file">
         # which is by design the only type of element allowed to receive/hold a file
         # disable the OS file picker
-        browser.execute_script(
+        self.browser.execute_script(
             """document.addEventListener('click', function(evt) {
                 if (evt.target.type === 'file')
                     evt.preventDefault();
@@ -80,43 +73,81 @@ class InstaPage:
             """
         )
         # make an <input type="file"> available
-        element = browser.find_element_by_xpath(
+        element = self.browser.find_element_by_xpath(
             "/html/body/div[1]/section/nav[2]/div/div/div[2]/div/div/div[3]"
         ).click()
         # assign the file to the <input type="file">
 
-        browser.find_element_by_css_selector("input[type=file]").send_keys(
-            self.picture_path
+        self.browser.find_element_by_css_selector("input[type=file]").send_keys(
+            picture_path
         )
         sleep(2)
-        browser.find_element_by_xpath(
+        self.browser.find_element_by_xpath(
             "/html/body/div[1]/section/div[1]/header/div/div[2]/button"
         ).click()
         sleep(1.5)
-        textarea = browser.find_element_by_xpath(
+        textarea = self.browser.find_element_by_xpath(
             "/html/body/div[1]/section/div[2]/section[1]/div[1]/textarea"
         )
-        text = random.choice(self.descriptions) + " ".join(
-            random.sample(self.hashtags, 5)
-        )
+
         print(text)
         textarea.send_keys(text)
         # share
-        browser.find_element_by_xpath(
+        self.browser.find_element_by_xpath(
             "/html/body/div[1]/section/div[1]/header/div/div[2]/button"
         ).click()
 
 
-user_agent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16"
-profile = webdriver.FirefoxProfile()
-profile.set_preference("general.useragent.override", user_agent)
-browser = webdriver.Firefox(profile)
-browser.set_window_size(360, 640)
-browser.implicitly_wait(2)
+def get_quote_of_the_day():
+    df = pd.read_csv("quotes/quotes_to_post.csv")
+    quote_of_the_day = df.sample()
+    df.drop(df.index[quote_of_the_day.index]).to_csv(
+        "quotes/quotes_to_post.csv", index=False
+    )
 
-home_page = HomePage(browser)
-home_page.login()
-insta_page = InstaPage(browser)
-insta_page.upload()
+    df_posted = pd.read_csv("quotes/quotes_posted.csv")
+    df_posted.append(quote_of_the_day).to_csv("quotes/quotes_posted.csv", index=False)
+    return quote_of_the_day
 
-browser.close()
+
+def get_description(quote, hashtags):
+    description = quote["Description - can be same as pic"]
+    if quote["direct quote"] == "Yes" and (
+        quote["Reference"] != "Maria" or quote["Reference"] != "Ben's notes"
+    ):
+        description = f"{description} by {quote['Reference']} #{quote['Reference'].replace(' ', '')} "
+    return description + " ".join(random.sample(hashtags, 10))
+
+
+def main():
+    user_agent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16"
+    profile = webdriver.FirefoxProfile()
+    profile.set_preference("general.useragent.override", user_agent)
+    browser = webdriver.Firefox(profile)
+    browser.set_window_size(360, 640)
+    browser.implicitly_wait(2)
+
+    home_page = HomePage(browser)
+    home_page.login()
+    insta_page = InstaPage(browser)
+
+    quote = get_quote_of_the_day()
+    picture_path = generate_and_get_image_path(quote)
+    print(picture_path)
+    with open("hashtags.txt") as f:
+        hashtags = [h.strip() for h in f.read().split(",")]
+
+    # Quote has to be a series
+    description = get_description(quote.iloc[0], hashtags)
+
+    # Path has to be the full absolute path
+    insta_page.upload(
+        f"/Users/doreensacker/Desktop/DB/instagram/{picture_path}", description
+    )
+
+    browser.close()
+
+
+if __name__ == "__main__":
+    main()
+
