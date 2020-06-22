@@ -27,34 +27,20 @@ with smart_run(session):
     )
 
     # activities
-
     session.follow_user_followers(
-        ["andreasoosart", "amystoneart"],
+        ["wordsfrom.soul_"],
         amount=100,
         randomize=False,
         interact=False,
         sleep_delay=601,
     )
 
-    """ First step of Unfollow action - Unfollow not follower users...
-    """
     session.unfollow_users(
         amount=100,
         instapy_followed_enabled=True,
         instapy_followed_param="nonfollowers",
         style="FIFO",
         unfollow_after=12 * 60 * 60,
-        sleep_delay=601,
-    )
-
-    """ Second step of Massive Follow...
-    """
-
-    session.follow_user_followers(
-        ["jeanniedouglasart", "betty.krause.art", "claire_desjardins_art"],
-        amount=100,
-        randomize=False,
-        interact=False,
         sleep_delay=601,
     )
 
