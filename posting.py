@@ -116,7 +116,7 @@ def get_description(quote, hashtags):
         quote["Reference"] != "Maria" or quote["Reference"] != "Ben's notes"
     ):
         description = f"{description} by {quote['Reference']} #{quote['Reference'].replace(' ', '')} "
-    return description + " ".join(random.sample(hashtags, 10))
+    return description + " ".join(random.sample(hashtags, 8))
 
 
 def main():
