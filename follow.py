@@ -28,26 +28,32 @@ with smart_run(session):
 
     # activities
     session.follow_user_followers(
-        ["wordsfrom.soul_"],
-        amount=100,
+        ["wordsfrom.soul_", "wordselite0"],
+        amount=111,
         randomize=False,
         interact=False,
         sleep_delay=601,
     )
 
     session.unfollow_users(
-        amount=100,
+        amount=111,
         instapy_followed_enabled=True,
         instapy_followed_param="nonfollowers",
         style="FIFO",
         unfollow_after=12 * 60 * 60,
         sleep_delay=601,
     )
+    
+    session.follow_user_followers(
+        ["penning.poetry", "thequotesoriginals"],
+        amount=111,
+        randomize=False,
+        interact=False,
+        sleep_delay=601,
+    )
 
-    """ Second step of Unfollow action - Unfollow not follower users...
-    """
     session.unfollow_users(
-        amount=100,
+        amount=111,
         instapy_followed_enabled=True,
         instapy_followed_param="nonfollowers",
         style="FIFO",
@@ -58,7 +64,7 @@ with smart_run(session):
     """ Clean all followed user - Unfollow all users followed by InstaPy...
     """
     session.unfollow_users(
-        amount=200,
+        amount=222,
         instapy_followed_enabled=True,
         instapy_followed_param="ALL",
         style="FIFO",
