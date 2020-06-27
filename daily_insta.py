@@ -69,6 +69,7 @@ with smart_run(session):
 
     session.set_do_follow(enabled=True, percentage=34, times=1)
     session.set_user_interact(amount=3, randomize=True, percentage=27, media="Photo")
+    session.set_delimit_commenting(enabled=True, max_comments=10000, min_comments=0)
 
     # activity
     session.like_by_tags(my_hashtags, amount=7, interact=True, randomize=True)
