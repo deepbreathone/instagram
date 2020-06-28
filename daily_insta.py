@@ -34,14 +34,14 @@ with smart_run(session):
         sleepyhead=True,
         stochastic_flow=True,
         notify_me=True,
-        peak_likes_daily=222,
+        peak_likes_daily=111,
         peak_comments_hourly=3,
         peak_comments_daily=21,
         peak_follows_daily=222,
         peak_unfollows_hourly=35,
         peak_unfollows_daily=222,
-        peak_server_calls_hourly=3000,
-        peak_server_calls_daily=4700,
+        peak_server_calls_hourly=500,
+        # peak_server_calls_daily=3000,
     )
 
     session.set_relationship_bounds(
@@ -49,10 +49,10 @@ with smart_run(session):
         potency_ratio=None,
         # potency_ratio=-1.5,
         delimit_by_numbers=True,
-        max_followers=10000,
-        max_following=None,
-        min_followers=25,
-        min_following=25,
+        # max_followers=10000,
+        # max_following=None,
+        # min_followers=25,
+        # min_following=25,
     )
 
     session.set_skip_users(
@@ -74,7 +74,7 @@ with smart_run(session):
     # activity
     session.like_by_tags(my_hashtags, amount=7, interact=True, randomize=True)
     session.follow_user_followers(
-        ["wordsfrom.soul_", "wordselite0"],
+        ["wordsfrom.soul_", "wordselite0", " h.e.l.e.n.m.a.r.i.e"],
         amount=111,
         randomize=False,
         interact=False,
@@ -89,9 +89,9 @@ with smart_run(session):
         unfollow_after=12 * 60 * 60,
         sleep_delay=601,
     )
-    
+
     session.follow_user_followers(
-        ["penning.poetry", "thequotesoriginals"],
+        ["penning.poetry", "thequotesoriginals", "poetsandpoemz"],
         amount=111,
         randomize=False,
         interact=False,
